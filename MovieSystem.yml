@@ -1,0 +1,269 @@
+openapi: 3.0.1
+info:
+  title: Movies API
+  version: "1.0"
+servers:
+  - url: http://localhost:8080
+paths:
+  /api/v1/get/movies:
+    get:
+      summary: Get list of movies
+      responses:
+        '200':
+          description: List of movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieResponse'
+  /api/v1/get/actors:
+    get:
+      summary: Get list of actors
+      responses:
+        '200':
+          description: List of actors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    gender:
+                      type: string
+                    birthday:
+                      type: string
+  /api/v1/post/movies:
+    post:
+      summary: Create a new movie
+      security:
+        - BasicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMovieRequest'
+      responses:
+        '201':
+          description: Movie created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/v1/post/actors:
+    post:
+      summary: Create a new actor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActorRequest'
+      responses:
+        '201':
+          description: Actor created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/v1/delete/movies:
+    delete:
+      summary: Delete a movie
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Movie deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/v1/delete/actors:
+    delete:
+      summary: Delete an actor
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Actor deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/v1/upd/actors:
+    put:
+      summary: Update an actor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActorRequest'
+      responses:
+        '200':
+          description: Actor updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/v1/upd/movie:
+    put:
+      summary: Update a movie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMovieRequest'
+      responses:
+        '200':
+          description: Movie updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+  /api/v1/search/movies:
+    get:
+      summary: Search movies by title or actor name
+      parameters:
+        - name: search
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieResponse'
+components:
+  schemas:
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    MovieResponse:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        release_date:
+          type: string
+        rating:
+          type: integer
+        actors:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+    CreateMovieRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        release_date:
+          type: string
+        rating:
+          type: integer
+        actors:
+          type: array
+          items:
+            type: integer
+    CreateActorRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        gender:
+          type: string
+        birthday:
+          type: string
+    UpdateActorRequest:
+      type: object
+      properties:
+          id:
+            type: integer
+          name:
+            type: string
+          gender:
+            type: string
+          birthday:
+            type: string
+    UpdateMovieRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        release_date:
+          type: string
+        rating:
+          type: integer
+        actors:
+          type: array
+          items:
+            type: integer
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic

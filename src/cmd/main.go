@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rs/cors"
+
 	"vktest/src/handler"
 	"vktest/src/storage"
 	"vktest/src/tools"
@@ -24,23 +26,31 @@ func main() {
 
 	handler := handler.NewHandler(psqlDB)
 
-	http.HandleFunc("/api/v1/get/movies", tools.RequestLogger(handler.GetMovies))
-	http.HandleFunc("/api/v1/get/actors", tools.RequestLogger(handler.GetActors))
+	mux := http.NewServeMux()
 
-	http.HandleFunc("/api/v1/post/movies", tools.RequestAuth(handler.CreateMovie))
-	http.HandleFunc("/api/v1/post/actors", tools.RequestAuth(handler.CreateActor))
+	mux.HandleFunc("/api/v1/get/movies", tools.RequestLogger(handler.GetMovies))
+	mux.HandleFunc("/api/v1/get/actors", tools.RequestLogger(handler.GetActors))
 
-	http.HandleFunc("/api/v1/delete/movies", tools.RequestAuth(handler.DeleteMovie))
-	http.HandleFunc("/api/v1/delete/actors", tools.RequestAuth(handler.DeleteActor))
+	mux.HandleFunc("/api/v1/post/movies", tools.RequestAuth(handler.CreateMovie))
+	mux.HandleFunc("/api/v1/post/actors", tools.RequestAuth(handler.CreateActor))
 
-	http.HandleFunc("/api/v1/upd/actors", tools.RequestAuth(handler.UpdateActor))
-	http.HandleFunc("/api/v1/upd/movie", tools.RequestAuth(handler.UpdateMovie))
-	http.HandleFunc("/api/v1/search/movies", tools.RequestLogger(handler.SearchMovies))
+	mux.HandleFunc("/api/v1/delete/movies", tools.RequestAuth(handler.DeleteMovie))
+	mux.HandleFunc("/api/v1/delete/actors", tools.RequestAuth(handler.DeleteActor))
 
-	port := "8080"
-	// Запуск сервера
-	log.Println("Starting server on :" + port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	mux.HandleFunc("/api/v1/upd/actors", tools.RequestAuth(handler.UpdateActor))
+	mux.HandleFunc("/api/v1/upd/movie", tools.RequestAuth(handler.UpdateMovie))
+	mux.HandleFunc("/api/v1/search/movies", tools.RequestLogger(handler.SearchMovies))
+
+	corsCustom := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"},
+		AllowedHeaders: []string{"Content-Type", "Authorization"},
+	})
+
+	corsHandler := corsCustom.Handler(mux)
+
+	log.Println("Starting server on :8080")
+	if err := http.ListenAndServe(":8080", corsHandler); err != nil {
 		log.Fatal(err)
 	}
 }
