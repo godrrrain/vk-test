@@ -63,6 +63,8 @@ paths:
   /api/v1/post/actors:
     post:
       summary: Create a new actor
+      security:
+        - BasicAuth: []
       requestBody:
         required: true
         content:
@@ -85,6 +87,8 @@ paths:
   /api/v1/delete/movies:
     delete:
       summary: Delete a movie
+      security:
+        - BasicAuth: []
       parameters:
         - name: id
           in: query
@@ -107,6 +111,8 @@ paths:
   /api/v1/delete/actors:
     delete:
       summary: Delete an actor
+      security:
+        - BasicAuth: []
       parameters:
         - name: id
           in: query
@@ -129,6 +135,8 @@ paths:
   /api/v1/upd/actors:
     put:
       summary: Update an actor
+      security:
+        - BasicAuth: []
       requestBody:
         required: true
         content:
@@ -151,6 +159,8 @@ paths:
   /api/v1/upd/movie:
     put:
       summary: Update a movie
+      security:
+        - BasicAuth: []
       requestBody:
         required: true
         content:
